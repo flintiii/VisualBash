@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Can a framework be developed that would allow for extensive use of bash as a general purpose information management system? YES!
 
 The program QBASIC had a framework that allowed you to access individual subroutines.
@@ -35,3 +36,7 @@ So, extend this idea with Graphic Secure Dispatch, soon to be renamed tropes a c
 Note that loading everything into a variable also works.
 Pay attention to the wisdom of [Robert Muth] (http://robert.muth.org/) this will be incorporated into 
 the new template examples...
+=======
+# VisualBash
+ Visual Bash  (also avaiilable at VisualBash.org), is a modest and seriously tongue-in-cheek bash programmiung framework.
+>>>>>>> 614f95777fb0dbda08d17f7b498cf4d707bcb06a
