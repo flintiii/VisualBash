@@ -1,0 +1,206 @@
+#!/bin/bash
+# 08/06/2016 09:59:41 AM pflint
+# This is a general include file, and needs a shim to load it and run it correctly
+# The next line is the shim...
+bsm+=("${BASH_SOURCE[@]}") # add current source file to stack
+#
+#
+#* function summy - Tests dummy include in source file.
+function summy(){
+echo "This is the \""$FUNCNAME"\" function in "$0" version "$version #debug
+echo "this is from the file "$incf
+echo ${BASH_SOURCE[@]}
+} # Test:
+#
+#
+#* function county - Lists all functions in any and all sources used.
+function county(){
+echo "This is the \""$FUNCNAME"\" function in "$0" version "$version #debug
+# Go through our copy of the BASH_SOURCE array, and output lists of subroutines 
+bsa=$(echo "${bsm[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
+echo "The sorted array from main include bsa is = "${bsa[@]}
+	n=1
+#D echo  "${bsa[@]}" | tr ' ' '\n'|sed '/^$/d'; spause
+echo  "${bsa[@]}" | tr ' ' '\n' |sed '/^$/d' |while read line; do
+	echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>> sub-script #"$n:" "$line ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	n=$(( n+ 1 ))
+	# grep -H '^\#\*' $line; 
+	grep '^\#\*' $line; 
+done
+} # Test:
+#
+#
+#* function birst - Builds Index.RST - Builds index.rst from subsidiary files available.
+function birst(){
+echo "This is the \""$FUNCNAME"\" function in "$0" version "$version #debug
+#
+indir="/home/flint/trantor/doc/"
+outfile="/home/flint/trantor/test.rst" >>  $outfile
+touch $outfile
+read -d '' String <<"EOF"
+.. trantor documentation master file, created by
+   birst.shi fed to sphinx on 2017-01-12 07:04:28.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+    (C) P Flint, Barre Open Systems Institute Liscensed under GPLI
+
+
+
+Welcome to trantor's Linux Format CDs!
+=====================================
+
+This is version 2016-09-28 07:14:28   
+
+Contents:
+	Each CD below can be downloaded or mounted
+
+.. toctree::
+   :maxdepth: 3
+
+EOF
+# echo "this is the string"
+echo "$String"
+# echo $indir
+#
+# prints first section
+ls -1 $indir*.rst | grep -v index  |sed "s:$indir:       :" |sed "s:.rst::" |sort -n
+#
+read -d '' String <<"EOF"
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
+EOF
+# echo "this is the string"
+echo "$String"
+#
+# now beginst the tricky stuff...
+echo ""
+echo ""
+ls -1 $indir*.rst | grep -v index  |sed "s:$indir:       :" |sed "s:.rst::" |sort -n |while read line; 
+do 
+	echo ".. |lxf"$line"f| image:: ../catalog/pix/lxf"$line"-f.jpg"
+	echo "   :scale: 30%"
+	echo "   :align: middle"
+	echo "   :target: ./"$line".html"
+done
+#
+# Now the table stuff...
+echo " "
+echo " "
+colums=3
+#D echo $colums
+#D divider="+-------------+-------------+-------------+"
+divider="+------------+------------+------------+"
+echo $divider
+ls -1 $indir*.rst | grep -v index  |sed "s:$indir:       :" |sed "s:.rst::" |sort -n |
+while read line;
+do 
+	#
+	s1=$line; 
+	o1=" |lxf"$s1"f|  "
+	if [ ${#s1} -eq 4 ]; then o1=" |lxf"$s1"f| "; fi
+	if [ ${#s1} -lt 3 ]; then o1="            "; fi
+	read line; 
+	# 
+	s2=$line; 
+	o2=" |lxf"$s2"f|  "
+	if [ ${#s2} -eq 4 ]; then o2=" |lxf"$s2"f| "; fi
+	if [ ${#s2} -lt 3 ]; then o2="            "; fi
+	read line; 
+	# 
+	s3=$line; 
+	o3=" |lxf"$s3"f|  "
+	if [ ${#s3} -eq 4 ]; then o3=" |lxf"$s3"f| "; fi
+	if [ ${#s3} -lt 3 ]; then o3="            "; fi
+	#D echo $s1" "${#s1}"   "$s2" "${#s2}"   "$s3" "${#s3} >&2
+	# echo "| |lxf"$s1"f|  | |lxf"$s2"f|  | |lxf"$s3"f|  |"
+	echo "|$o1|$o2|$o3|"
+	echo $divider
+done
+# prints toc section at end
+# This is a candidate to automate further.
+read -d '' String <<"EOF"
+Contents:
+	Each CD below can be downloaded or mounted
+
+.. toctree::
+	December 2011	154 <154.rst>
+	January 2012	155 <155.rst>
+	February 2012	156 <156.rst>
+	March 2012	157 <157.rst>
+	March 2012	158 <158.rst>
+	April 2012	159 <159.rst>
+	May 2012	160 <160.rst>
+	June 2012	161 <161.rst>
+	July 2012	162a <162a.rst>
+	July 2012	162b <162b.rst>
+	August 2012	163 <163.rst>
+	September 2012	164 <164.rst>
+	October 2012	165 <165.rst>
+	November 2012	166 <166.rst>
+	December 2012	167 <167.rst>
+	January 2013	168 <168.rst>
+	January 2013	169 <169.rst>
+	March 2013	170 <170.rst>
+	March 2013	171a <171a.rst>
+	March 2013	171da <171da.rst>
+	April 2013	172 <172.rst>
+	May 2013	173 <173.rst>
+	June 2013	174 <174.rst>
+	July 2013	175 <175.rst>
+	August 2013	176 <176.rst>
+	September 2013	177 <177.rst>
+	October 2013	178 <178.rst>
+	November 2013	179 <179.rst>
+	December 2013	180 <180.rst>
+	January 2014	181 <181.rst>
+	February 2014	182 <182.rst>
+	March 2014	183 <183.rst>
+	March 2014	184 <184.rst>
+	April 2014	185 <185.rst>
+	May 2014	186 <186.rst>
+	June 2014	187 <187.rst>
+	July 2014	188 <188.rst>
+	August 2014	189 <189.rst>
+	September 2014	190A <190A.rst>
+	September 2014	190B <190B.rst>
+	November 2014	193 <193.rst>
+	December 2014	194 <194.rst>
+	January 2015	195 <195.rst>
+	February 2015	196 <196.rst>
+	March 2015	197 <197.rst>
+	April 2015	198 <198.rst>
+	May 2015	199 <199.rst>
+	June 2015	200 <200.rst>
+	July 2015 	201 <201.rst>
+	August 2015 	202 <202.rst>
+	September 2015 	203 <203.rst>
+	October 2015 	204 <204.rst>
+	October 2015 	205 <205.rst>
+	November 2015 	206 <206.rst>
+	December 2015 	207 <207.rst>
+	January 2016 	208 <208.rst>
+	February 2016 	209 <209.rst>
+	March 2016 	210 <210.rst>
+	April 2016 	211 <211.rst>
+	May 2016 	212 <212.rst>
+	June 2016 	213 <213.rst>
+	July 2016 	214 <214.rst>
+	August 2016 	215 <215.rst>
+	September 2016 	216 <216.rst>
+	October 2016 	217 <217.rst>
+	November 2016 	218 <218.rst>
+
+EOF
+# echo "this is the string"
+echo "$String"
+
+} # Test: ctrantor.sh birst
+#
+#
+#
+

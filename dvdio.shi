@@ -1,0 +1,100 @@
+#!/bin/bash
+# 2016-10-27 06:50:23 pflint
+# dvdio.shi
+# This is a general include file, and needs a shim to load it and run it correctly
+# The next line is the shim...
+bsm+=("${BASH_SOURCE[@]}") # add current source file to stack
+#
+#* function 2ummy - Rename and fill stuff in between braces
+function 2ummy(){
+echo "This is the \""$FUNCNAME"\" function in "$0" version "$version #debug
+} # Test:
+#
+#
+#* function diriso - shows all the iso files in the current directory
+function diriso(){
+echo "This is the \""$FUNCNAME"\" function in "$0" version "$version #debug
+echo "The files available to be loaded on media or on the website are:"
+#D ls | grep iso |xargs ls 
+ls "$sd"| grep iso |grep LXF |pr --columns 3 -aT -J 
+echo "These are located in: ""\"$sd\"""  directory"
+#D |xargs ls
+} # Test:
+#
+#* function makeiso - burns an iso image from a CD/DVD  ...
+function makeiso(){
+echo "This is the \""$FUNCNAME"\" function in "$0" version "$version #debug
+clear; echo "this is version "$version
+name=$(isoinfo -d -i /dev/cdrom | grep -i "volume id" | cut -d ":" -f 2 | tr -d " ")
+# name="mswin7" # add test and default name here
+block=$(isoinfo -d -i /dev/cdrom | grep -i "block size" | cut -d ":" -f 2 | tr -d " ")
+START=$(date +%s)
+echo "Name of this DVD "$name" and the block size is "$block
+# do something
+# start your script work here
+spause
+echo "begin to copy with cat the file "$PWD$"/"$name.iso; cat /dev/cdrom > ./$name.iso
+# your function ends here
+END=$(date +%s)
+DIFF=$(( $END - $START ))
+echo "It took $DIFF seconds"
+eject /dev/cdrom
+} # Test: ~flint/bin/ocdg.sh makeiso 
+#
+#* function tst - tests if CD burned ok.
+function tst(){
+echo "This is the \""$FUNCNAME"\" function in "$0" version "$version #debug
+lpdir=${var2/.iso/}
+echo "This step mounts "$var2" as subdirectory "$lpdir" and copies the directory to the file dskd"
+# lvd=$(du -h --max-depth=1 $lpdir |tr -d $lpdir |md5sum|rev | cut -c 3- |rev) 
+mkdir $lpdir; mount -o loop $var2 $lpdir # >/dev/null
+cd $lpdir; du -h --max-depth=1 > ../dskdir; cd ..
+# cd $lpdir
+echo "This step mounts the dvd as subdirectory dvd and copies the directory to the file dvddir"
+echo "put the "$var2" cd in to test"
+isoinfo -d -i /dev/cdrom
+# spause
+# mkdir dvd; mount /dev/dvd dvd
+mkdir dvd; mount /dev/cdrom dvd
+cd dvd; du -h --max-depth=1 > ../dvddir; cd ..
+echo "This step calculates the checksum"
+clear
+$(diff dskdir dvddir >/dev/null) || echo "something broke"
+$(diff dskdir dvddir >/dev/null) && echo "Copy compares OK"
+# spause
+echo "unmount and clean up"
+umount $lpdir ;rm -rf $lpdir
+umount "dvd" ;rm -rf "dvd"
+rm -rf dvd $lpdir
+eject /dev/cdrom
+} # Test:ocdg.sh tst <filename.iso>
+#
+#* function prtcd - cuts a cd from <ISONAME> iso image...
+function prtcd(){
+echo "This is the \""$FUNCNAME"\" function in "$0" version "$version #debug
+echo "The file name you picked is "$var2
+if [ ! -f "$var2" ]; then 
+	echo "The File \"$var2\" Does Not Exist nothing can happen"
+	return 
+fi 
+echo "The File $var2 Exists"
+echo -n "Put a blank CD in and "
+UDI=`hal-find-by-capability --capability storage.cdrom`
+device=`hal-get-property --udi $UDI --key block.device`
+echo $device
+echo "Put a nice shiny new dvd in with at least "$(ls -alt $var2 | cut -d " " -f 5)" of capacity"
+spause
+wodim dev=$device -v -data $var2
+echo "all done.  Write "$var2" on the disk with the sharpie proviced"
+eject $device
+play /usr/share/sounds/freedesktop/stereo/alarm-clock-elapsed.oga 2>/dev/null
+} # Test: ocdg.sh tst <filename.iso>
+# Fri 21 Nov 2014 09:49:12 AM EST NOTES ON OVERSIZE ISO IMAGES:
+# http://gotoanswer.stanford.edu/error_while_burning_dvd_help-4325359/
+# 
+# ubuntu autolaunch "you have just inserted"
+# gnome-control-center &
+# applications > media
+# http://askubuntu.com/questions/6677/how-do-i-banish-the-you-have-just-inserted-an-audio-cd-dialog-forever
+# 
+
